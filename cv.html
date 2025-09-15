@@ -1,0 +1,332 @@
+import React, { useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Download,
+  Mail,
+  Phone,
+  MapPin,
+  Linkedin,
+  Cpu,
+  Hammer,
+  Palette,
+  Bot,
+  Languages,
+  Printer,
+  Wand2,
+  Filter,
+  Star,
+  CheckCircle,
+  ChevronRight,
+} from "lucide-react";
+
+// --- Datos del CV ---
+const data = {
+  name: "Josías Fernando Villa Alonzo",
+  title: "Técnico informático → Futuro Desarrollador Web",
+  location: "Portoviejo, Ecuador",
+  phone: "+593 978 801 946",
+  email: "josi_vi@hotmail.com",
+  linkedin: "https://www.linkedin.com/in/josias-fernando-villa-alonzo-049bb677",
+  birthdate: "16/12/1997",
+  summary:
+    "Técnico en informática en transición hacia el desarrollo de software. Experiencia en diagnóstico ultrarrápido (≤10 min) y solución de problemas de software, mantenimiento/optimización de equipos y atención al cliente. En formación en HTML, CSS, JavaScript y Programación con IA. Comunicación clara, oratoria destacada y enfoque en resultados.",
+  education: [
+    {
+      school: "EDTeam",
+      degree: "Programación Web e IA (HTML, CSS, JavaScript, IA)",
+      period: "2024 – presente",
+    },
+    {
+      school: "Certificado en reparación de computadoras y celulares",
+      degree: "Formación técnica (vigente por experiencia continua)",
+      period: "—",
+    },
+    {
+      school: "Colegio Blanca Flor Cañarte Farfán",
+      degree: "Informática y Contabilidad",
+      period: "2009 – 2016",
+    },
+  ],
+  experience: [
+    {
+      role: "Técnico en Reparación de Computadoras",
+      company: "VillTech",
+      period: "2021 – presente",
+      bullets: [
+        "Diagnóstico de fallas de software en ≤10 minutos mediante herramientas y procesos propios.",
+        "Instalación de SO, recuperación de datos, formateo y reparación de SSD/HDD.",
+        "Ensamblaje y optimización de computadores.",
+        "Atención a clientes en Portoviejo, Montecristi y San Plácido, con alta satisfacción.",
+      ],
+      tags: ["Soporte", "Windows", "Hardware", "Optimización"],
+    },
+    {
+      role: "Diseñador Gráfico",
+      company: "Sellos Villa",
+      period: "2007 – presente",
+      bullets: [
+        "Logotipos, letreros, sellos y material publicitario.",
+        "Atención directa a clientes y gestión de pedidos.",
+        "CorelDraw avanzado; Photoshop básico.",
+      ],
+      tags: ["Diseño", "CorelDraw", "Photoshop", "Atención al cliente"],
+    },
+    {
+      role: "Soporte Técnico",
+      company: "AKROS / Banco Pichincha",
+      period: "2021",
+      bullets: [
+        "Instalación y configuración de routers SD-WAN en oficinas y sucursales.",
+        "Soporte técnico in situ para equipos de la red bancaria.",
+      ],
+      tags: ["Redes", "SD-WAN", "Soporte"],
+    },
+    {
+      role: "Emprendedor",
+      company: "Venta de licencias originales de software",
+      period: "—",
+      bullets: [
+        "Comercialización, activación y soporte postventa.",
+        "Asesoría de herramientas según necesidad del usuario.",
+      ],
+      tags: ["Negocio", "Licencias", "Soporte"],
+    },
+  ],
+  skills: [
+    { name: "HTML", level: 65, area: "software" },
+    { name: "CSS", level: 60, area: "software" },
+    { name: "JavaScript", level: 45, area: "software" },
+    { name: "Programación con IA", level: 40, area: "software" },
+    { name: "Soporte de software", level: 90, area: "soporte" },
+    { name: "Diagnóstico rápido", level: 95, area: "soporte" },
+    { name: "Reparación SSD/HDD", level: 75, area: "soporte" },
+    { name: "Ensamblaje de PCs", level: 80, area: "soporte" },
+    { name: "CorelDraw (2024)", level: 85, area: "diseño" },
+    { name: "Photoshop (básico)", level: 40, area: "diseño" },
+    { name: "Oratoria", level: 85, area: "blandas" },
+    { name: "Administración de tareas", level: 70, area: "blandas" },
+  ],
+  languages: [
+    { name: "Español", level: "Nativo" },
+    { name: "Inglés técnico", level: "B1+ (casi B2) – lectura fluida, conversación funcional" },
+    { name: "Lengua de señas", level: "Intermedio" },
+  ],
+  achievements: [
+    "Diagnóstico de software en menos de 10 minutos.",
+    "Clientes satisfechos en Portoviejo, Montecristi y San Plácido.",
+    "Negocio propio de licencias y soporte de software.",
+  ],
+};
+
+// Utilidad para descargar como PDF con print
+function usePrint() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const onPrint = () => window.print();
+  return { ref, onPrint };
+}
+
+const Badge: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs">{children}</span>
+);
+
+const Section: React.FC<{ title: string; icon?: React.ReactNode; children: React.ReactNode }> = ({
+  title,
+  icon,
+  children,
+}) => (
+  <section className="mb-8">
+    <div className="flex items-center gap-2 mb-3">
+      <h2 className="text-xl font-semibold">{title}</h2>
+      {icon}
+    </div>
+    <div className="space-y-4">{children}</div>
+  </section>
+);
+
+const ProgressBar: React.FC<{ value: number }> = ({ value }) => (
+  <div className="h-2 w-full rounded-full bg-gray-200">
+    <motion.div
+      initial={{ width: 0 }}
+      whileInView={{ width: `${value}%` }}
+      viewport={{ once: true }}
+      transition={{ type: "spring", stiffness: 80, damping: 18 }}
+      className="h-2 rounded-full bg-black"
+    />
+  </div>
+);
+
+const Filters: React.FC<{ active: string; onChange: (v: string) => void }> = ({ active, onChange }) => (
+  <div className="flex flex-wrap items-center gap-2">
+    <span className="text-sm opacity-70 flex items-center gap-1"><Filter className="h-4 w-4"/>Filtrar:</span>
+    {[
+      { key: "all", label: "Todo" },
+      { key: "software", label: "Software" },
+      { key: "soporte", label: "Soporte" },
+      { key: "diseño", label: "Diseño" },
+      { key: "blandas", label: "Blandas" },
+    ].map((f) => (
+      <button
+        key={f.key}
+        onClick={() => onChange(f.key)}
+        className={`rounded-full border px-3 py-1 text-sm transition ${
+          active === f.key ? "bg-black text-white" : "hover:bg-gray-100"
+        }`}
+      >
+        {f.label}
+      </button>
+    ))}
+  </div>
+);
+
+export default function CVInteractive() {
+  const { ref, onPrint } = usePrint();
+  const [filter, setFilter] = useState("all");
+
+  const filteredSkills = useMemo(
+    () => data.skills.filter((s) => filter === "all" || s.area === filter),
+    [filter]
+  );
+
+  return (
+    <div className="min-h-screen bg-white text-black print:bg-white">
+      {/* Header */}
+      <header className="sticky top-0 z-10 backdrop-blur bg-white/70 border-b">
+        <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-black text-white grid place-items-center font-bold">JV</div>
+            <div>
+              <h1 className="text-lg font-semibold leading-none">{data.name}</h1>
+              <p className="text-sm opacity-70">{data.title}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <a href={`mailto:${data.email}`} className="rounded-full border px-3 py-1 text-sm hover:bg-gray-100 flex items-center gap-2"><Mail className="h-4 w-4"/>Email</a>
+            <a href={`tel:${data.phone.replace(/\s/g, "")}`} className="rounded-full border px-3 py-1 text-sm hover:bg-gray-100 flex items-center gap-2"><Phone className="h-4 w-4"/>Llamar</a>
+            <a href={data.linkedin} target="_blank" className="rounded-full border px-3 py-1 text-sm hover:bg-gray-100 flex items-center gap-2"><Linkedin className="h-4 w-4"/>LinkedIn</a>
+            <button onClick={onPrint} className="rounded-full border px-3 py-1 text-sm hover:bg-gray-100 flex items-center gap-2"><Printer className="h-4 w-4"/>Imprimir/Guardar PDF</button>
+          </div>
+        </div>
+      </header>
+
+      {/* Body */}
+      <main ref={ref} className="mx-auto max-w-5xl px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Columna Izquierda */}
+        <aside className="lg:col-span-1 space-y-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl border p-5 shadow-sm">
+            <div className="flex items-center gap-2 mb-2 text-sm opacity-70"><MapPin className="h-4 w-4"/>{data.location}</div>
+            <p className="text-sm leading-relaxed">{data.summary}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Badge><Cpu className="h-3 w-3 mr-1"/>Software</Badge>
+              <Badge><Hammer className="h-3 w-3 mr-1"/>Soporte</Badge>
+              <Badge><Palette className="h-3 w-3 mr-1"/>Diseño</Badge>
+              <Badge><Bot className="h-3 w-3 mr-1"/>IA</Badge>
+            </div>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl border p-5 shadow-sm">
+            <Section title="Idiomas" icon={<Languages className="h-5 w-5"/>}>
+              <ul className="space-y-2">
+                {data.languages.map((l) => (
+                  <li key={l.name} className="flex items-start gap-2"><CheckCircle className="h-4 w-4 mt-0.5"/><span><span className="font-medium">{l.name}:</span> {l.level}</span></li>
+                ))}
+              </ul>
+            </Section>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl border p-5 shadow-sm">
+            <Section title="Logros" icon={<Star className="h-5 w-5"/>}>
+              <ul className="list-disc pl-5 space-y-1">
+                {data.achievements.map((a, i) => (
+                  <li key={i}>{a}</li>
+                ))}
+              </ul>
+            </Section>
+          </motion.div>
+        </aside>
+
+        {/* Columna Derecha */}
+        <section className="lg:col-span-2 space-y-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl border p-6 shadow-sm">
+            <Section title="Experiencia" icon={<Wand2 className="h-5 w-5"/>}>
+              <div className="relative pl-4 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-gray-200">
+                {data.experience.map((exp, idx) => (
+                  <div key={idx} className="relative pb-6">
+                    <div className="absolute -left-1 top-1 h-3 w-3 rounded-full bg-black" />
+                    <h3 className="font-semibold">{exp.role} · <span className="opacity-70">{exp.company}</span></h3>
+                    <p className="text-sm opacity-70 mb-1">{exp.period}</p>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {exp.tags.map((t) => (
+                        <Badge key={t}>{t}</Badge>
+                      ))}
+                    </div>
+                    <ul className="list-disc pl-5 space-y-1">
+                      {exp.bullets.map((b, i) => (
+                        <li key={i}>{b}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </Section>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl border p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Habilidades</h2>
+              <Filters active={filter} onChange={setFilter} />
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              {filteredSkills.map((s) => (
+                <div key={s.name} className="rounded-xl border p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">{s.name}</span>
+                    <span className="text-sm opacity-70">{s.level}%</span>
+                  </div>
+                  <ProgressBar value={s.level} />
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl border p-6 shadow-sm">
+            <Section title="Educación" icon={<ChevronRight className="h-5 w-5"/>}>
+              <div className="grid gap-4">
+                {data.education.map((e, i) => (
+                  <div key={i} className="rounded-xl border p-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium">{e.degree}</h3>
+                      <span className="text-sm opacity-70">{e.period}</span>
+                    </div>
+                    <p className="text-sm opacity-80 mt-1">{e.school}</p>
+                  </div>
+                ))}
+              </div>
+            </Section>
+          </motion.div>
+
+          {/* Placeholder de proyectos: a completar luego */}
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl border p-6 shadow-sm">
+            <Section title="Proyectos (en construcción)" icon={<Bot className="h-5 w-5"/>}>
+              <p className="text-sm opacity-80">Aquí añadiremos tus proyectos de programación y demos con IA (landing HTML/CSS, mini app JS, automatización con IA, etc.).</p>
+            </Section>
+          </motion.div>
+        </section>
+      </main>
+
+      <footer className="mx-auto max-w-5xl px-4 pb-10">
+        <div className="rounded-2xl border p-4 text-sm text-center opacity-70">
+          Actualizado por última vez en 2025 · Hecho con ❤️ y React · Usa el botón "Imprimir/Guardar PDF" para exportar
+        </div>
+      </footer>
+
+      {/* Estilos de impresión */}
+      <style>{`
+        @media print {
+          header, footer, button, a[href^="http"], .rounded-full.border { display: none !important; }
+          main { padding: 0 !important; }
+          .border, .shadow-sm { box-shadow: none !important; }
+        }
+      `}</style>
+    </div>
+  );
+}
